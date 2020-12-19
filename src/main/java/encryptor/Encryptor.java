@@ -1,7 +1,5 @@
 package encryptor;
 
-import secure.RandomSalt;
-
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
@@ -13,10 +11,20 @@ public class Encryptor {
     private static final int ITERATIONS = 65536;
     private static final int KEY_LENGTH = 512;
     private static final String ALGORITHM = "PBKDF2WithHmacSHA512";
-    private static String password = "miContrasenia";
+    private static String password = "theBestPassword";
 
     public static void main(String[] args) {
-        System.out.println(hashPassword(password, RandomSalt.generateSalt(8)));
+        String salt = RandomSalt.generateSalt(8);
+        String key = hashPassword(password, salt);
+
+        System.out.println("Generated key: " + key);
+
+        System.out.println("Verifying password...");
+        if(verifyPassword("aDifferentPassword", key, salt)){
+            System.out.println("The password is correct!");
+        } else {
+            System.out.println("The password is incorrect!!");
+        }
     }
 
     public static String hashPassword (String pass, String salt) {
@@ -44,7 +52,9 @@ public class Encryptor {
 
     public static boolean verifyPassword (String password, String key, String salt) {
         String optEncrypted = hashPassword(password, salt);
-        if (!optEncrypted.isEmpty()) return false;
+        System.out.println(optEncrypted);
+        System.out.println(key);
+        if (optEncrypted.isEmpty()) return false;
         return optEncrypted.equals(key);
     }
 }
